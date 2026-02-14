@@ -49,7 +49,7 @@ class BeautyAI_VideoCombine:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("filename",)
+    RETURN_NAMES = ("video_path",)
     FUNCTION = "combine_video"
     OUTPUT_NODE = True
     CATEGORY = "BeautyAI"
@@ -66,7 +66,7 @@ class BeautyAI_VideoCombine:
             audio: AUDIO dict (可选)
 
         Returns:
-            tuple: (filename,)
+            tuple: (video_path,) - 返回完整的视频文件路径供 RunPod worker 使用
         """
         temp_dir = None
         audio_file = None
@@ -185,14 +185,27 @@ class BeautyAI_VideoCombine:
             print(f"BeautyAI VideoCombine: 文件大小: {file_size} bytes")
             print(f"BeautyAI VideoCombine: 文件名: {output_filename}")
 
-            return (output_filename,)
+            # 返回格式：ComfyUI 标准的输出节点格式
+            return {
+                "ui": {
+                    "videos": [{
+                        "filename": output_filename,
+                        "subfolder": "",
+                        "type": "output"
+                    }]
+                },
+                "result": (output_filename,)
+            }
 
         except Exception as e:
             error_msg = f"视频合成失败: {str(e)}"
             print(f"BeautyAI VideoCombine: {error_msg}")
             import traceback
             traceback.print_exc()
-            return ("",)
+            return {
+                "ui": {"videos": []},
+                "result": ("",)
+            }
 
         finally:
             # 清理临时文件
