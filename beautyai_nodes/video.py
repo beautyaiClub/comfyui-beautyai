@@ -183,30 +183,17 @@ class BeautyAI_VideoCombine:
             file_size = os.path.getsize(output_path)
             print(f"BeautyAI VideoCombine: 视频合成成功")
             print(f"BeautyAI VideoCombine: 文件大小: {file_size} bytes")
-            print(f"BeautyAI VideoCombine: 文件名: {output_filename}")
+            print(f"BeautyAI VideoCombine: 输出路径: {output_path}")
 
-            # 返回格式：使用 "images" 键以兼容 RunPod worker
-            # RunPod worker 期望所有媒体文件都在 "images" 键中
-            return {
-                "ui": {
-                    "images": [{
-                        "filename": output_filename,
-                        "subfolder": "",
-                        "type": "output"
-                    }]
-                },
-                "result": (output_filename,)
-            }
+            # 返回完整路径，供后续节点（如 R2 上传）使用
+            return (output_path,)
 
         except Exception as e:
             error_msg = f"视频合成失败: {str(e)}"
             print(f"BeautyAI VideoCombine: {error_msg}")
             import traceback
             traceback.print_exc()
-            return {
-                "ui": {"videos": []},
-                "result": ("",)
-            }
+            return ("",)
 
         finally:
             # 清理临时文件
