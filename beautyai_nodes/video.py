@@ -185,10 +185,11 @@ class BeautyAI_VideoCombine:
             print(f"BeautyAI VideoCombine: 文件大小: {file_size} bytes")
             print(f"BeautyAI VideoCombine: 文件名: {output_filename}")
 
-            # 返回格式：ComfyUI 标准的输出节点格式
+            # 返回格式：使用 "images" 键以兼容 RunPod worker
+            # RunPod worker 期望所有媒体文件都在 "images" 键中
             return {
                 "ui": {
-                    "videos": [{
+                    "images": [{
                         "filename": output_filename,
                         "subfolder": "",
                         "type": "output"
