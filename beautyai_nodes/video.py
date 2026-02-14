@@ -49,7 +49,7 @@ class BeautyAI_VideoCombine:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("filename",)
+    RETURN_NAMES = ("video_path",)
     FUNCTION = "combine_video"
     OUTPUT_NODE = True
     CATEGORY = "BeautyAI"
@@ -66,7 +66,7 @@ class BeautyAI_VideoCombine:
             audio: AUDIO dict (可选)
 
         Returns:
-            tuple: (filename,)
+            tuple: (video_path,) - 返回完整的视频文件路径供 RunPod worker 使用
         """
         temp_dir = None
         audio_file = None
@@ -183,9 +183,10 @@ class BeautyAI_VideoCombine:
             file_size = os.path.getsize(output_path)
             print(f"BeautyAI VideoCombine: 视频合成成功")
             print(f"BeautyAI VideoCombine: 文件大小: {file_size} bytes")
-            print(f"BeautyAI VideoCombine: 文件名: {output_filename}")
+            print(f"BeautyAI VideoCombine: 完整路径: {output_path}")
 
-            return (output_filename,)
+            # 返回完整路径，让 RunPod worker 可以找到并返回文件
+            return {"ui": {"videos": [{"filename": output_filename, "subfolder": "", "type": "output"}]}, "result": (output_path,)}
 
         except Exception as e:
             error_msg = f"视频合成失败: {str(e)}"
