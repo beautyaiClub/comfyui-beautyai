@@ -4,6 +4,7 @@ R2 上传节点
 """
 
 import os
+import uuid
 import boto3
 from botocore.exceptions import ClientError
 
@@ -23,12 +24,6 @@ class BeautyAI_UploadVideoToR2:
                     "multiline": False
                 }),
             },
-            "optional": {
-                "object_prefix": ("STRING", {
-                    "default": "videos/",
-                    "multiline": False
-                }),
-            },
         }
 
     RETURN_TYPES = ("STRING",)
@@ -37,13 +32,12 @@ class BeautyAI_UploadVideoToR2:
     OUTPUT_NODE = True
     CATEGORY = "BeautyAI"
 
-    def upload_to_r2(self, video_path, object_prefix="videos/"):
+    def upload_to_r2(self, video_path):
         """
         上传视频到 R2
 
         Args:
             video_path: 视频文件的完整路径
-            object_prefix: R2 对象前缀（目录）
 
         Returns:
             tuple: (r2_url,)
@@ -79,12 +73,14 @@ class BeautyAI_UploadVideoToR2:
             # 获取文件名
             filename = os.path.basename(video_path)
 
-            # 构建 R2 对象键
-            object_key = f"{object_prefix}{filename}"
+            # 生成 UUID 并构建 R2 对象键：generated/{uuid}/{filename}
+            unique_id = str(uuid.uuid4())
+            object_key = f"generated/{unique_id}/{filename}"
 
             print(f"BeautyAI R2 Upload: 开始上传")
             print(f"BeautyAI R2 Upload: 本地文件: {video_path}")
             print(f"BeautyAI R2 Upload: R2 对象键: {object_key}")
+            print(f"BeautyAI R2 Upload: UUID: {unique_id}")
 
             # 创建 S3 客户端（R2 兼容 S3 API）
             s3_client = boto3.client(
